@@ -17,7 +17,7 @@ export default function Header() {
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4">
-          <Link href="/">
+          <Link href="/" passHref legacyBehavior>
             <img src="/placeholder.svg" alt="Tarquini Logo" className="h-8 w-auto mr-4" />
           </Link>
           <nav className="hidden md:flex space-x-4">
@@ -30,7 +30,7 @@ export default function Header() {
                   <DropdownMenuContent>
                     {item.subcategories?.map((subcategory) => (
                       <DropdownMenuItem key={subcategory.name}>
-                        <Link href={subcategory.href}>
+                        <Link href={subcategory.href} passHref legacyBehavior>
                           <div>
                             <div>{subcategory.name}</div>
                             <small className="text-xs text-gray-500">{subcategory.description}</small>
@@ -41,7 +41,7 @@ export default function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Link key={item.name} href={item.href} className="text-gray-600 hover:text-gray-900">
+                <Link key={item.name} href={item.href} passHref legacyBehavior className="text-gray-600 hover:text-gray-900">
                   {item.name}
                 </Link>
               )
@@ -66,7 +66,7 @@ export default function Header() {
                         <DropdownMenuContent>
                           {item.subcategories?.map((subcategory) => (
                             <DropdownMenuItem key={subcategory.name}>
-                              <Link href={subcategory.href}>
+                              <Link href={subcategory.href} passHref legacyBehavior>
                                 <div>
                                   <div>{subcategory.name}</div>
                                   <small className="text-xs text-gray-500">{subcategory.description}</small>
@@ -77,7 +77,7 @@ export default function Header() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     ) : (
-                      <Link href={item.href} className="text-gray-600 hover:text-gray-900">
+                      <Link href={item.href} passHref legacyBehavior className="text-gray-600 hover:text-gray-900">
                         {item.name}
                       </Link>
                     )}

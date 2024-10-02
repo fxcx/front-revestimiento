@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <>
       <Suspense fallback={<p>Loading...</p>}>
-      <main className="p-3">
+      <main>
         <HomeSection />
       </main>
       </Suspense>

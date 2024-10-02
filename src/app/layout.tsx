@@ -1,5 +1,5 @@
-import Footer from "@/components/layoutSection/footer"
-import Header from "@/components/layoutSection/header"
+import Footer from "@/components/layoutCpts/footer"
+import Header from "@/components/layoutCpts/header"
 import type { Metadata } from "next"
 import "./globals.css"
 import { cn } from "@/lib/utils"
@@ -19,8 +19,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "https://flexmembranaprotege.com/og-image.jpg",
-        width: 800,
-        height: 600,
+        width: 80,
+        height: 60,
         alt: "Flex Membrana Protege",
       },
     ],

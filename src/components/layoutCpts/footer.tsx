@@ -1,20 +1,31 @@
 export default function Footer() {
   return (
-    <footer className="min-h-screen bg-gray-800 text-gray-300">
+    <footer className="p-5 bg-gray-800 text-gray-300 w-full">
       <div className="container mx-auto py-8 px-4 lg:px-0">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+         
           <div className="col-span-1 md:col-span-2 lg:col-span-1">
-            <h2 className="text-2xl font-bold text-white">
-              Atencion al cliente
-            </h2>
-            <p className="mt-4">9:00hs hasta las 19:00hs</p>
-            <p className="mt-4">flexmenbranaprotege@gemail.com</p>
+            <div>
+              <h2 className="text-xl font-bold text-white">
+                Atención al cliente
+              </h2>
+              <p className="mt-4">Horario: 9:00 a 19:00 hs</p>
+              <p className="mt-2">
+                Correo:{" "}
+                <a
+                  href="mailto:flexmenbranaprotege@gemail.com"
+                  className="underline text-gray-400"
+                >
+                  flexmenbranaprotege@gemail.com
+                </a>
+              </p>
+            </div>
           </div>
 
-          <div className="flex justify-items-center flex-col">
-            <h2 className="text-2xl font-bold text-white p-1 my-3">Redes</h2>
-            <ul className="flex gap-5">
-              <li className="grid place-content-center">
+          <div className="col-span-1 md:col-span-2 lg:col-span-1">
+            <h2 className="text-xl text-center font-bold text-white gap-3">Redes Sociales</h2>
+            <ul className="flex justify-center gap-4 py-6">
+              <li className="">
                 <a
                   href="https://www.facebook.com/tupagina"
                   target="_blank"
@@ -94,51 +105,26 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="flex flex-col">
-            <div className="flex">
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-center">
               <svg
-                version="1.0"
-                width="18"
-                height="22"
-                viewBox="0 0 64 64"
-                enable-background="new 0 0 64 64"
+                className="h-6 w-6 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 24 24"
               >
-                <g>
-                  <path
-                    fill="#F76D57"
-                    d="M32,52.789l-12-18C18.5,32,16,28.031,16,24c0-8.836,7.164-16,16-16s16,7.164,16,16
-		c0,4.031-2.055,8-4,10.789L32,52.789z"
-                  />
-                  <g>
-                    <path
-                      fill="#394240"
-                      d="M32,0C18.746,0,8,10.746,8,24c0,5.219,1.711,10.008,4.555,13.93c0.051,0.094,0.059,0.199,0.117,0.289
-			l16,24C29.414,63.332,30.664,64,32,64s2.586-0.668,3.328-1.781l16-24c0.059-0.09,0.066-0.195,0.117-0.289
-			C54.289,34.008,56,29.219,56,24C56,10.746,45.254,0,32,0z M44,34.789l-12,18l-12-18C18.5,32,16,28.031,16,24
-			c0-8.836,7.164-16,16-16s16,7.164,16,16C48,28.031,45.945,32,44,34.789z"
-                    />
-                    <circle fill="#394240" cx="32" cy="24" r="8" />
-                  </g>
-                </g>
+                <path d="M12 2C8.1 2 5 5.1 5 9c0 4.2 7 13 7 13s7-8.8 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5s2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5z" />
               </svg>
-              <span className="text-white ml-3">Pilar, zona este</span>
+              <span className="text-white ml-2">Pilar, Zona Este</span>
             </div>
-
-            <div className="flex mt-4">
-              <svg height="18" width="22" version="1.1" viewBox="0 0 512 512">
-                <g>
-                  <path
-                    d="M94.811,21.696c-35.18,22.816-42.091,94.135-28.809,152.262c10.344,45.266,32.336,105.987,69.42,163.165
-		c34.886,53.79,83.557,102.022,120.669,129.928c47.657,35.832,115.594,58.608,150.774,35.792
-		c17.789-11.537,44.218-43.058,45.424-48.714c0,0-15.498-23.896-18.899-29.14l-51.972-80.135
-		c-3.862-5.955-28.082-0.512-40.386,6.457c-16.597,9.404-31.882,34.636-31.882,34.636c-11.38,6.575-20.912,0.024-40.828-9.142
-		c-24.477-11.262-51.997-46.254-73.9-77.947c-20.005-32.923-40.732-72.322-41.032-99.264c-0.247-21.922-2.341-33.296,8.304-41.006
-		c0,0,29.272-3.666,44.627-14.984c11.381-8.392,26.228-28.286,22.366-34.242l-51.972-80.134c-3.401-5.244-18.899-29.14-18.899-29.14
-		C152.159-1.117,112.6,10.159,94.811,21.696z"
-                  />
-                </g>
+            <div className="flex items-center">
+              <svg
+                className="h-6 w-6 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M6.62 10.79a15.07 15.07 0 006.99 6.99l2.2-2.2a1 1 0 011.06-.27 9.57 9.57 0 003.16.59c.55 0 1 .45 1 1V19c0 .55-.45 1-1 1C10.43 20 4 13.57 4 6c0-.55.45-1 1-1h2.5c.55 0 1 .45 1 1 0 1.09.21 2.14.59 3.16.13.35.05.75-.27 1.06l-2.2 2.2z" />
               </svg>
-              <span className="text-white ml-1">+54 tu numero</span>
+              <span className="text-white ml-2">+54 tu número</span>
             </div>
           </div>
 

@@ -1,0 +1,113 @@
+// Prisma schema — f-revestimineto
+// Base de datos: SQLite (archivo local, generado en build)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────
+// PRODUCTOS (Shop)
+// ─────────────────────────────────────────
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  longDescription String?
+  price       Float
+  category    String    // "Bordes" | "Pisos" | "Accesorios" | etc.
+  imageUrl    String
+  colors      Int?      // cantidad de colores disponibles (opcional)
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  questions   Question[]
+  images      ProductImage[]
+
+  @@index([category])
+}
+
+// Galería de imágenes adicionales por producto
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  alt       String?
+  order     Int     @default(0)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────
+// PREGUNTAS Y RESPUESTAS (Q&A del detalle)
+// ─────────────────────────────────────────
+
+model Question {
+  id        Int       @id @default(autoincrement())
+  question  String
+  answer    String?   // null = sin responder aún
+  productId Int
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  answeredAt DateTime?
+
+  @@index([productId])
+}
+
+// ─────────────────────────────────────────
+// REVESTIMIENTOS
+// ─────────────────────────────────────────
+
+model Texture {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique  // "RAYA-2 ULTRAFINO" | "RAYA-2 FINO" | etc.
+  description String
+  performance String   // rendimiento en KG/m²
+  idealFor    String   // JSON array serializado: ["uso1", "uso2"]
+  active      Boolean  @default(true)
+
+  colors      TextureColor[]
+}
+
+model TextureColor {
+  id        Int     @id @default(autoincrement())
+  name      String  // "Verde Ibera", "Azul Cielo", etc.
+  hex       String  // valor hexadecimal real del color: "#4A7C59"
+  imageUrl  String? // imagen de muestra del color aplicado (opcional)
+  order     Int     @default(0)
+  textureId Int
+  texture   Texture @relation(fields: [textureId], references: [id], onDelete: Cascade)
+
+  @@index([textureId])
+}
+
+// ─────────────────────────────────────────
+// PISOS (Micropiso)
+// ─────────────────────────────────────────
+
+model FloorColor {
+  id       Int     @id @default(autoincrement())
+  name     String  // "Beige", "Gris Claro", etc.
+  hex      String  // valor hexadecimal real del color
+  imageUrl String? // imagen de muestra (opcional)
+  order    Int     @default(0)
+  active   Boolean @default(true)
+}
+
+// ─────────────────────────────────────────
+// SERVICIOS
+// ─────────────────────────────────────────
+
+model Service {
+  id          Int     @id @default(autoincrement())
+  name        String  // "Electricidad", "Plomería", etc.
+  description String
+  imageUrl    String  // URL externa de imagen real
+  order       Int     @default(0)  // orden de aparición en la página
+  active      Boolean @default(true)
+}

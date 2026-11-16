@@ -151,6 +151,16 @@ Módulo eliminado por decisión del cliente. El link `/contacto` debe ser removi
 
 ---
 
+## Administración del catálogo Shop (`/admin/catalogo`)
+
+| Funcionalidad | Estado | Notas |
+|---------------|--------|-------|
+| Pantalla de administración del catálogo | 🔶 Parcial | Primera interfaz lista: listado responsive, búsqueda, filtro por categoría, recuentos y formulario para crear/editar productos. |
+| Datos del formulario | 🔶 Parcial | Nombre, descripción, categoría, precio, imagen opcional y visibilidad. No se administra cantidad ni stock. |
+| Cambios temporales en la interfaz | 🔶 Parcial | Crear, editar y publicar/ocultar actualiza el estado de la pantalla mientras permanece abierta; se informa claramente que no se persiste ni modifica Shop. |
+| Persistencia en SQLite / sincronización con Shop | ❌ | Pendiente conectar el panel con Prisma/SQLite y que el catálogo público lea los mismos productos. |
+| Acceso autenticado y protección de escrituras | ❌ | Pendiente antes de habilitar operaciones de base de datos o publicar una administración funcional. La pantalla actual no aplica cambios reales. |
+
 ## Backend / Base de datos
 
 | Funcionalidad | Estado | Notas |

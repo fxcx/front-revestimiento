@@ -6,7 +6,7 @@ type ServicioCardProps = {
   imageUrl: string
 }
 
-const WA_NUMBER = "541151446625"
+const WA_NUMBER = "5491128199325"
 
 function buildWhatsAppUrl(mensaje: string): string {
   return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(mensaje)}`
@@ -54,11 +54,7 @@ export default function ServicioCard({ nombre, descripcion, imageUrl }: Servicio
           {descripcion}
         </p>
 
-        {/* Botones: aparecen al hacer hover */}
-        <div className="flex gap-2
-                        opacity-0 translate-y-4
-                        transition-all duration-300 ease-out
-                        group-hover:opacity-100 group-hover:translate-y-0">
+        <div className="flex gap-2">
           <a
             href={urlPresupuesto}
             target="_blank"
@@ -78,7 +74,7 @@ export default function ServicioCard({ nombre, descripcion, imageUrl }: Servicio
                        hover:bg-white/30 backdrop-blur-sm
                        transition-colors duration-200"
           >
-            Consultar
+            Contactar
           </a>
         </div>
       </div>

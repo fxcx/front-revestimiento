@@ -8,7 +8,6 @@ Sitio web de venta y presentación de revestimientos, pisos y microcemento. Desp
 |-----------|-----------|
 | [arquitectura.md](./arquitectura.md) | Stack, estructura de carpetas, despliegue |
 | [modulos.md](./modulos.md) | Estado de cada módulo: terminado / pendiente |
-| [implementacion.md](./implementacion.md) | **Área de trabajo** — acá pedís lo que querés implementar |
 
 ---
 

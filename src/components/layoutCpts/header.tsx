@@ -19,8 +19,8 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4">
 
-          <Link href="/">
-            <img src="/placeholder.svg" alt="Logo" className="h-8 w-auto mr-4" />
+          <Link href="/" aria-label="Flex Membrana Protege — Inicio" className="mr-4 text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
+            Flex Membrana Protege
           </Link>
 
           {/* Nav desktop */}

@@ -63,7 +63,22 @@ export default function ProductGridLive({ products }: { products: ProductSummary
         </div>
       ) : (
         <div className="rounded-xl border border-dashed border-slate-300 px-6 py-16 text-center text-sm text-slate-600">
-          {products.length ? "No hay productos en esta categoría." : "Estamos actualizando el catálogo. Consultanos por WhatsApp para recibir información."}
+          {products.length ? (
+            "No hay productos en esta categoría."
+          ) : (
+            <div className="mx-auto flex max-w-lg flex-col items-center gap-4">
+              <p>Estamos actualizando el catálogo. Podés terminar tu consulta por revestimientos y pisos directamente con un asesor.</p>
+              <Button asChild>
+                <a
+                  href={`https://wa.me/541151446625?text=${encodeURIComponent("Hola, quiero consultar por revestimientos y pisos disponibles y recibir ayuda para elegir.")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Consultar disponibilidad por WhatsApp
+                </a>
+              </Button>
+            </div>
+          )}
         </div>
       )}
 

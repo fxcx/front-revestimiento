@@ -49,16 +49,16 @@ El mensaje se construye dinámicamente en el cliente con `encodeURIComponent()` 
 
 | Funcionalidad | Estado | Notas |
 |---------------|--------|-------|
-| Selector de texturas (Raya-2) | ✅ | 4 texturas con datos completos en `texturedata.ts`. |
-| Paleta de colores por textura | 🔶 Parcial | Muestra círculos de color. El color de fondo se genera desde el nombre del color (texto → CSS), lo que falla para nombres compuestos como "Verde Ibera". Necesita imágenes reales. |
-| Dialog de zoom por color | 🔶 Parcial | Abre un dialog con un bloque de color sólido. Sin imagen real. |
-| Tab Descripción | ✅ | Texto e ideal para completos. |
-| Tab Rendimiento | 🔶 Parcial | Texto presente. Botón "Calcular Rendimiento" sin funcionalidad. |
-| Tab Base Color | 🔶 Parcial | Texto genérico, no vinculado a la textura seleccionada. |
-| Botón "Comprar Online" | ❌ | Sin funcionalidad, no navega al shop. |
-| Productos relacionados | ❌ | Hardcodeados con placeholders y sin link real. |
-| Imagen principal del color seleccionado | ❌ | Usa `src={prueba}` (imagen de prueba global), no imagen del color. |
-| Botón "Pedir presupuesto por WhatsApp" | ❌ | Debe enviar: textura seleccionada + color seleccionado. |
+| Selector de texturas (Raya-2) | ✅ | 4 texturas. Al cambiar textura resetea el color al primero de la nueva. |
+| Paleta de colores por textura | ✅ | Círculos con hex real via `getColorHex()`. Escala al hover. Ring visual en seleccionado. |
+| Muestra grande del color seleccionado | ✅ | Bloque aspect-[4/3] con color hex real. Transición suave al cambiar. |
+| Dialog de zoom | ✅ | Abre muestra ampliada aspect-square con nombre y línea. |
+| Tab Descripción | ✅ | Texto e ideal para completos. Items como chips con borde (igual a Pisos). |
+| Tab Rendimiento | ✅ | Texto presente. Link a calculadora. |
+| Tab Base Color | ✅ | Texto completo. |
+| Botón "Comprar Online" | ✅ | Navega a `/shop`. |
+| Calculadora de rendimiento + WhatsApp | ✅ | `ProductQuoteCalculator` con textura + color seleccionados. Envía m², kg y envases por WhatsApp. |
+| Productos relacionados (Aplicaciones) | ✅ | 3 cards con imágenes reales de Unsplash (cocinas, baños, exteriores). Sin placeholders. |
 
 ---
 
@@ -66,15 +66,15 @@ El mensaje se construye dinámicamente en el cliente con `encodeURIComponent()` 
 
 | Funcionalidad | Estado | Notas |
 |---------------|--------|-------|
-| Paleta de 24 colores | 🔶 Parcial | Mismo problema que revestimientos: color generado por nombre de texto. |
-| Tab Descripción | ✅ | Texto completo de Micropiso. |
-| Tab Aplicación | 🔶 Parcial | Texto presente. Imágenes de llana y dificultad usan placeholder. |
-| Tab Rendimiento | ✅ | Datos y cálculo presentes. |
-| Botón "Calcular Rendimiento" | ❌ | Sin funcionalidad. |
-| Botón "Comprar Online" | ❌ | Sin funcionalidad. |
-| Sección Emulsión Micropiso | 🔶 Parcial | Texto presente. Botón "+ Info" sin destino. |
-| Sección Hidrolaca Micromax | 🔶 Parcial | Texto presente. Botón "+ Info" sin destino. |
-| Botón "Pedir presupuesto por WhatsApp" | ❌ | Debe enviar: color de micropiso seleccionado. |
+| Paleta de 24 colores | ✅ | Colores con hex real via `getColorHex()`. Ring visual en seleccionado. |
+| Muestra del color seleccionado | ✅ | Bloque aspect-[3/2] con color hex real. |
+| Tab Descripción | ✅ | Texto completo de Micropiso. Items ideales como chips. |
+| Tab Aplicación | ✅ | Texto presente. Badges LM y dificultad. |
+| Tab Rendimiento | ✅ | Datos y link a calculadora. |
+| Calculadora de rendimiento + WhatsApp | ✅ | `ProductQuoteCalculator` con color seleccionado. Envía m², kg y envases por WhatsApp. |
+| Botón "Comprar Online" | ✅ | Navega a `/shop`. |
+| Sección Emulsión Micropiso | ✅ | Texto presente. Link a `/shop`. |
+| Sección Hidrolaca Micromax | ✅ | Texto presente. Link a `/shop`. |
 
 ---
 

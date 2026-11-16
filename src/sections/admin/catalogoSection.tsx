@@ -1,8 +1,11 @@
 "use client"
 
 import { useMemo, useState, type FormEvent } from "react"
+import { useRouter } from "next/navigation"
+import useSWR from "swr"
 import Image from "next/image"
-import { ArrowLeft, Eye, EyeOff, Layers3, Package, Plus, Search, X } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff, Layers3, LogOut, Package, Plus, Search, X } from "lucide-react"
+import { authClient } from "@/lib/auth-client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -17,19 +20,20 @@ type Product = {
   category: string
   image: string
   description: string
+  longDescription?: string | null
   active: boolean
 }
 
-type ProductDraft = Omit<Product, "id">
+type DatabaseProduct = Omit<Product, "id" | "image"> & { id: number; imageUrl: string }
 
-const initialProducts: Product[] = [
-  { id: "1", name: "Borde Listón Deck Atérmico Antideslizante 100x20x3", price: 9200, category: "Bordes", image: "/assets/11_327ef02c-184b-43f0-bf1e-43da6f0be101_1160x_crop_center.webp", description: "Borde atérmico antideslizante para piscinas.", active: true },
-  { id: "2", name: "Solárium Pisos Atérmicos 50x50 Cm.", price: 52838, category: "Pisos", image: "/assets/14_1160x_crop_center.webp", description: "Pisos atérmicos para solárium y exteriores.", active: true },
-  { id: "3", name: "Pastina Atérmica 1 Kg Para Losetas Baldosas Solárium", price: 150, category: "Accesorios", image: "/assets/16_6be8f9bc-f6c2-4bfc-8a00-2e7c3a7cfa28_1160x_crop_center.webp", description: "Pastina para terminaciones de losetas atérmicas.", active: true },
-  { id: "4", name: "Baldosa Borde Pileta Atermico Venezia", price: 30000, category: "Bordes", image: "/assets/18_1160x_crop_center.webp", description: "Baldosa de borde para piscina.", active: false },
-  { id: "5", name: "Borde Atérmico Curvo Para Piscinas", price: 68156, category: "Bordes", image: "/assets/1_a0f529c0-3271-4713-8895-feb1ff7b4dd6_1160x_crop_center.webp", description: "Borde curvo atérmico para piscinas.", active: true },
-  { id: "6", name: "Borde Plano Curvo Atérmico Antideslizante Piscina", price: 15555, category: "Bordes", image: "/assets/2_0fb66e67-e157-4c4e-94f4-ab7760ef797c_1160x_crop_center.webp", description: "Borde plano antideslizante para piscina.", active: true },
-]
+async function fetchProducts(url: string): Promise<Product[]> {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error("No se pudo cargar el catálogo.")
+  const rows: DatabaseProduct[] = await response.json()
+  return rows.map(({ id, imageUrl, ...product }) => ({ ...product, id: String(id), image: imageUrl }))
+}
+
+type ProductDraft = Omit<Product, "id">
 
 const emptyDraft: ProductDraft = {
   name: "",
@@ -37,6 +41,7 @@ const emptyDraft: ProductDraft = {
   category: "Bordes",
   image: "",
   description: "",
+  longDescription: "",
   active: true,
 }
 
@@ -44,7 +49,9 @@ const formatPrice = (price: number) =>
   new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(price)
 
 export default function CatalogoAdminSection() {
-  const [products, setProducts] = useState(initialProducts)
+  const router = useRouter()
+  const { data: products = [], mutate, isLoading, error } = useSWR<Product[]>("/api/products?includeInactive=true", fetchProducts)
+
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState("Todos")
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -72,28 +79,67 @@ export default function CatalogoAdminSection() {
 
   const openEdit = (product: Product) => {
     setEditingId(product.id)
-    setDraft({ name: product.name, price: product.price, category: product.category, image: product.image, description: product.description, active: product.active })
+    setDraft({ name: product.name, price: product.price, category: product.category, image: product.image, description: product.description, longDescription: product.longDescription || "", active: product.active })
     setNotice("")
     setDialogOpen(true)
   }
 
-  const saveProduct = (event: FormEvent<HTMLFormElement>) => {
+  const saveProduct = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!draft.name.trim() || !draft.description.trim() || !Number.isFinite(draft.price) || draft.price < 0) return
 
-    if (editingId) {
-      setProducts((current) => current.map((product) => product.id === editingId ? { ...draft, id: editingId, name: draft.name.trim() } : product))
-      setNotice("Cambios aplicados a esta vista de prueba.")
-    } else {
-      setProducts((current) => [{ ...draft, id: `demo-${Date.now()}`, name: draft.name.trim() }, ...current])
-      setNotice("Producto agregado a esta vista de prueba.")
+    const response = await fetch(editingId ? `/api/products/${editingId}` : "/api/products", {
+      method: editingId ? "PATCH" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: draft.name.trim(),
+        price: draft.price,
+        category: draft.category,
+        imageUrl: draft.image,
+        description: draft.description.trim(),
+        longDescription: draft.longDescription?.trim() || null,
+        active: draft.active,
+      }),
+    })
+
+    if (!response.ok) {
+      setNotice(response.status === 401 ? "Tu sesión venció. Volvé a iniciar sesión." : "No se pudo guardar el producto.")
+      return
     }
+
+    await mutate()
+    setNotice(editingId ? "Cambios guardados en el catálogo." : "Producto guardado en el catálogo.")
     setDialogOpen(false)
   }
 
-  const toggleActive = (productId: string) => {
-    setProducts((current) => current.map((product) => product.id === productId ? { ...product, active: !product.active } : product))
-    setNotice("Estado actualizado solo en esta vista de prueba.")
+  const signOut = async () => {
+    await authClient.signOut()
+    router.replace("/admin/login")
+    router.refresh()
+  }
+
+  const toggleActive = async (product: Product) => {
+    const response = await fetch(`/api/products/${product.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: product.name,
+        price: product.price,
+        category: product.category,
+        imageUrl: product.image,
+        description: product.description,
+        longDescription: product.longDescription || null,
+        active: !product.active,
+      }),
+    })
+
+    if (!response.ok) {
+      setNotice("No se pudo actualizar el estado del producto.")
+      return
+    }
+
+    await mutate()
+    setNotice("Estado actualizado y guardado en el catálogo.")
   }
 
   return (
@@ -111,14 +157,19 @@ export default function CatalogoAdminSection() {
             <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">Catálogo de productos</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Gestioná la información que se muestra en Shop. Los productos no llevan control de cantidad.</p>
           </div>
-          <Button onClick={openCreate} className="h-11 rounded-lg bg-emerald-800 px-5 text-white hover:bg-emerald-900">
-            <Plus aria-hidden="true" className="mr-2 size-4" /> Nuevo producto
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={signOut} variant="outline" className="h-11 rounded-lg border-slate-300 px-4">
+              <LogOut aria-hidden="true" className="mr-2 size-4" /> Cerrar sesión
+            </Button>
+            <Button onClick={openCreate} className="h-11 rounded-lg bg-emerald-800 px-5 text-white hover:bg-emerald-900">
+              <Plus aria-hidden="true" className="mr-2 size-4" /> Nuevo producto
+            </Button>
+          </div>
         </div>
 
         <div role="status" className="mb-6 flex gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5 text-sm text-amber-950">
           <span className="mt-0.5 size-2 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
-          <p><strong>Vista preliminar:</strong> los cambios se mantienen solo mientras esta página está abierta. No se guardan en SQLite ni modifican el Shop; el guardado real se habilitará junto con el acceso autenticado al panel.</p>
+          <p><strong>Catálogo conectado:</strong> los cambios se guardan en Neon y se reflejan en Shop. Las escrituras requieren esta sesión de administrador.</p>
         </div>
 
         <div className="mb-6 grid gap-4 sm:grid-cols-2">
@@ -151,6 +202,7 @@ export default function CatalogoAdminSection() {
             </div>
           </div>
 
+          {error && <div role="alert" className="border-b border-red-100 bg-red-50 px-5 py-3 text-sm text-red-800">No pudimos cargar los productos de Neon. Actualizá la página para volver a intentar.</div>}
           {notice && <div role="status" className="flex items-center justify-between border-b border-emerald-100 bg-emerald-50 px-5 py-3 text-sm text-emerald-900"><span>{notice}</span><button type="button" aria-label="Cerrar aviso" onClick={() => setNotice("")}><X className="size-4" /></button></div>}
 
           <div className="hidden overflow-x-auto md:block">
@@ -163,7 +215,7 @@ export default function CatalogoAdminSection() {
                     <td className="px-4 py-4"><span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">{product.category}</span></td>
                     <td className="px-4 py-4 font-medium text-slate-900">{formatPrice(product.price)}</td>
                     <td className="px-4 py-4"><span className={`inline-flex items-center gap-1.5 text-sm ${product.active ? "text-emerald-800" : "text-slate-500"}`}><span className={`size-1.5 rounded-full ${product.active ? "bg-emerald-600" : "bg-slate-400"}`} />{product.active ? "Publicado" : "Oculto"}</span></td>
-                    <td className="px-5 py-4"><div className="flex justify-end gap-2"><Button variant="outline" size="sm" onClick={() => openEdit(product)} className="rounded-lg">Editar</Button><Button variant="ghost" size="sm" onClick={() => toggleActive(product.id)} aria-label={`${product.active ? "Ocultar" : "Publicar"} ${product.name}`} className="rounded-lg text-slate-600">{product.active ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}<span className="ml-2">{product.active ? "Ocultar" : "Publicar"}</span></Button></div></td>
+                    <td className="px-5 py-4"><div className="flex justify-end gap-2"><Button variant="outline" size="sm" onClick={() => openEdit(product)} className="rounded-lg">Editar</Button><Button variant="ghost" size="sm" onClick={() => toggleActive(product)} aria-label={`${product.active ? "Ocultar" : "Publicar"} ${product.name}`} className="rounded-lg text-slate-600">{product.active ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}<span className="ml-2">{product.active ? "Ocultar" : "Publicar"}</span></Button></div></td>
                   </tr>
                 ))}
               </tbody>
@@ -174,12 +226,12 @@ export default function CatalogoAdminSection() {
             {visibleProducts.map((product) => (
               <article key={product.id} className="rounded-xl border border-slate-200 p-3">
                 <div className="flex gap-3"><Image src={product.image || "/placeholder.svg"} alt="" width={64} height={64} unoptimized className="size-16 shrink-0 rounded-lg border border-slate-200 object-cover" /><div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><h2 className="text-sm font-semibold leading-5 text-slate-900">{product.name}</h2><span className={`size-2 shrink-0 rounded-full ${product.active ? "bg-emerald-600" : "bg-slate-400"}`} aria-label={product.active ? "Publicado" : "Oculto"} /></div><p className="mt-1 text-xs text-slate-500">{product.category} · {formatPrice(product.price)}</p></div></div>
-                <div className="mt-3 flex justify-end gap-2"><Button variant="outline" size="sm" onClick={() => openEdit(product)}>Editar</Button><Button variant="ghost" size="sm" onClick={() => toggleActive(product.id)}>{product.active ? "Ocultar" : "Publicar"}</Button></div>
+                <div className="mt-3 flex justify-end gap-2"><Button variant="outline" size="sm" onClick={() => openEdit(product)}>Editar</Button><Button variant="ghost" size="sm" onClick={() => toggleActive(product)}>{product.active ? "Ocultar" : "Publicar"}</Button></div>
               </article>
             ))}
           </div>
 
-          {visibleProducts.length === 0 && <div className="px-6 py-16 text-center"><Package aria-hidden="true" className="mx-auto size-8 text-slate-300" /><p className="mt-3 font-medium text-slate-900">No encontramos productos</p><p className="mt-1 text-sm text-slate-500">Probá con otro nombre o categoría.</p></div>}
+          {visibleProducts.length === 0 && <div className="px-6 py-16 text-center"><Package aria-hidden="true" className="mx-auto size-8 text-slate-300" /><p className="mt-3 font-medium text-slate-900">{isLoading ? "Cargando catálogo…" : "No encontramos productos"}</p><p className="mt-1 text-sm text-slate-500">{isLoading ? "Conectando con Neon." : "Probá con otro nombre o categoría."}</p></div>}
           <div className="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">Mostrando {visibleProducts.length} de {products.length} productos</div>
         </Card>
       </div>
@@ -196,7 +248,8 @@ export default function CatalogoAdminSection() {
               <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">Categoría<select value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value })} className="h-10 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option>Bordes</option><option>Pisos</option><option>Accesorios</option><option>Otros</option></select></label>
               <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">Precio (ARS)<Input required type="number" min="0" step="1" value={draft.price} onChange={(event) => setDraft({ ...draft, price: Number(event.target.value) })} /></label>
               <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2">Descripción<Textarea required maxLength={500} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} placeholder="Descripción breve para el catálogo" rows={3} /></label>
-              <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2">URL de imagen (opcional)<Input type="url" value={draft.image} onChange={(event) => setDraft({ ...draft, image: event.target.value })} placeholder="https://…" /></label>
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2">Descripción detallada (opcional)<Textarea maxLength={10000} value={draft.longDescription || ""} onChange={(event) => setDraft({ ...draft, longDescription: event.target.value })} placeholder="Información adicional para la página del producto" rows={4} /></label>
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2">Imagen (URL https o ruta /assets; opcional)<Input value={draft.image} onChange={(event) => setDraft({ ...draft, image: event.target.value })} placeholder="/assets/producto.webp" /></label>
               <label className="flex items-center gap-2 text-sm text-slate-700 sm:col-span-2"><input type="checkbox" checked={draft.active} onChange={(event) => setDraft({ ...draft, active: event.target.checked })} className="size-4 rounded border-slate-300 accent-emerald-800" /> Visible en el catálogo Shop</label>
             </div>
             <DialogFooter className="gap-2">

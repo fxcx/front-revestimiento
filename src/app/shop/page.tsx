@@ -1,5 +1,7 @@
-import ProductGrid from '@/sections/product/productoSection'
+import ProductDatabaseSection from "@/sections/product/productoDatabaseSection"
 
-export default function Home() {
-  return <ProductGrid />
+export const dynamic = "force-dynamic"
+
+export default function ShopPage() {
+  return <ProductDatabaseSection />
 }
